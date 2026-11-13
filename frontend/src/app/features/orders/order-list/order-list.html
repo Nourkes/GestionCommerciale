@@ -1,0 +1,90 @@
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Commandes</h1>
+    <p class="page-subtitle">{{ orders().length }} commande(s)</p>
+  </div>
+  <a routerLink="/orders/new" class="btn btn-primary">
+    <i class="bi bi-plus-lg me-1"></i> Nouvelle commande
+  </a>
+</div>
+
+<div class="card">
+  <div class="card-body border-bottom d-flex flex-wrap gap-2">
+    <div class="input-group search-box">
+      <span class="input-group-text"><i class="bi bi-search"></i></span>
+      <input type="search" class="form-control" placeholder="Rechercher par numéro ou client..."
+             [value]="searchTerm()" (input)="onSearch($event)" />
+    </div>
+    <select class="form-select status-filter" [value]="statusFilter()" (change)="onStatusChange($event)">
+      <option value="">Tous les statuts</option>
+      @for (option of statusOptions; track option[0]) {
+        <option [value]="option[0]">{{ option[1] }}</option>
+      }
+    </select>
+  </div>
+
+  @if (isLoading()) {
+    <div class="text-center py-5 text-muted">
+      <div class="spinner-border text-primary mb-2"></div>
+      <div>Chargement des commandes...</div>
+    </div>
+  } @else if (filteredOrders().length === 0) {
+    <div class="empty-state">
+      <i class="bi bi-receipt"></i>
+      @if (orders().length > 0) {
+        <p>Aucune commande ne correspond à ces critères.</p>
+      } @else {
+        <p>Aucune commande pour le moment.</p>
+        <a routerLink="/orders/new" class="btn btn-primary btn-sm">Créer la première commande</a>
+      }
+    </div>
+  } @else {
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Numéro</th>
+            <th>Client</th>
+            <th>Date</th>
+            <th>Statut</th>
+            <th class="text-center">Lignes</th>
+            <th class="text-end">Total HT</th>
+            <th class="text-end">Total TTC</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (order of filteredOrders(); track order.id) {
+            <tr>
+              <td><a [routerLink]="['/orders', order.id]" class="fw-semibold text-decoration-none">{{ order.orderNumber }}</a></td>
+              <td>{{ order.clientName }}</td>
+              <td>{{ order.orderDate | date: 'dd/MM/yyyy' }}</td>
+              <td><app-order-status-badge [status]="order.status" /></td>
+              <td class="text-center">{{ order.lineCount }}</td>
+              <td class="text-end">{{ order.totalHT | currency: currencyCode : 'code' : '1.3-3' }}</td>
+              <td class="text-end fw-semibold">{{ order.totalTTC | currency: currencyCode : 'code' : '1.3-3' }}</td>
+              <td class="text-end">
+                <div class="btn-group btn-group-sm">
+                  <a class="btn btn-light" [routerLink]="['/orders', order.id]" title="Voir le détail">
+                    <i class="bi bi-eye"></i>
+                  </a>
+                  @if (order.status === 'Draft') {
+                    <a class="btn btn-light" [routerLink]="['/orders', order.id, 'edit']" title="Modifier">
+                      <i class="bi bi-pencil"></i>
+                    </a>
+                  }
+                  @if (order.status !== 'Validated') {
+                    <button type="button" class="btn btn-light text-danger" title="Supprimer"
+                            (click)="deleteOrder(order)">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  }
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

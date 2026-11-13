@@ -1,0 +1,48 @@
+@if (product(); as product) {
+  <div class="page-header">
+    <div>
+      <a routerLink="/products" class="back-link"><i class="bi bi-arrow-left"></i> Retour aux produits</a>
+      <h1 class="page-title">{{ product.name }}</h1>
+      <p class="page-subtitle">Référence {{ product.reference }}</p>
+    </div>
+    <a [routerLink]="['/products', product.id, 'edit']" class="btn btn-primary">
+      <i class="bi bi-pencil me-1"></i> Modifier
+    </a>
+  </div>
+
+  <div class="card detail-card">
+    <div class="card-body p-4">
+      <dl class="detail-list">
+        <div>
+          <dt><i class="bi bi-hash"></i> Identifiant</dt>
+          <dd>{{ product.id }}</dd>
+        </div>
+        <div>
+          <dt><i class="bi bi-upc"></i> Référence</dt>
+          <dd>{{ product.reference }}</dd>
+        </div>
+        <div>
+          <dt><i class="bi bi-tag"></i> Prix unitaire HT</dt>
+          <dd>{{ product.unitPriceHT | currency: currencyCode : 'code' : '1.3-3' }}</dd>
+        </div>
+        <div>
+          <dt><i class="bi bi-boxes"></i> Stock</dt>
+          <dd><app-stock-badge [quantity]="product.stockQuantity" /></dd>
+        </div>
+        <div>
+          <dt><i class="bi bi-calendar3"></i> Date de création</dt>
+          <dd>{{ product.createdAt | date: 'dd/MM/yyyy à HH:mm' }}</dd>
+        </div>
+        <div class="full-width">
+          <dt><i class="bi bi-text-paragraph"></i> Description</dt>
+          <dd>{{ product.description || '—' }}</dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+} @else {
+  <div class="text-center py-5 text-muted">
+    <div class="spinner-border text-primary mb-2"></div>
+    <div>Chargement du produit...</div>
+  </div>
+}

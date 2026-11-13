@@ -1,0 +1,83 @@
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Produits</h1>
+    <p class="page-subtitle">{{ products().length }} produit(s) au catalogue</p>
+  </div>
+  <a routerLink="/products/new" class="btn btn-primary">
+    <i class="bi bi-plus-lg me-1"></i> Nouveau produit
+  </a>
+</div>
+
+<div class="card">
+  <div class="card-body border-bottom">
+    <div class="input-group search-box">
+      <span class="input-group-text"><i class="bi bi-search"></i></span>
+      <input type="search" class="form-control" placeholder="Rechercher par référence ou nom..."
+             [value]="searchTerm()" (input)="onSearch($event)" />
+    </div>
+  </div>
+
+  @if (isLoading()) {
+    <div class="text-center py-5 text-muted">
+      <div class="spinner-border text-primary mb-2"></div>
+      <div>Chargement des produits...</div>
+    </div>
+  } @else if (filteredProducts().length === 0) {
+    <div class="empty-state">
+      <i class="bi bi-box-seam"></i>
+      @if (searchTerm()) {
+        <p>Aucun produit ne correspond à « {{ searchTerm() }} ».</p>
+      } @else {
+        <p>Aucun produit pour le moment.</p>
+        <a routerLink="/products/new" class="btn btn-primary btn-sm">Ajouter le premier produit</a>
+      }
+    </div>
+  } @else {
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Référence</th>
+            <th>Produit</th>
+            <th class="text-end">Prix unitaire HT</th>
+            <th>Stock</th>
+            <th>Créé le</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (product of filteredProducts(); track product.id) {
+            <tr>
+              <td><span class="reference">{{ product.reference }}</span></td>
+              <td>
+                <div class="fw-semibold">{{ product.name }}</div>
+                @if (product.description) {
+                  <div class="text-muted small text-truncate description">{{ product.description }}</div>
+                }
+              </td>
+              <td class="text-end fw-semibold">
+                {{ product.unitPriceHT | currency: currencyCode : 'code' : '1.3-3' }}
+              </td>
+              <td><app-stock-badge [quantity]="product.stockQuantity" /></td>
+              <td>{{ product.createdAt | date: 'dd/MM/yyyy' }}</td>
+              <td class="text-end">
+                <div class="btn-group btn-group-sm">
+                  <a class="btn btn-light" [routerLink]="['/products', product.id]" title="Voir le détail">
+                    <i class="bi bi-eye"></i>
+                  </a>
+                  <a class="btn btn-light" [routerLink]="['/products', product.id, 'edit']" title="Modifier">
+                    <i class="bi bi-pencil"></i>
+                  </a>
+                  <button type="button" class="btn btn-light text-danger" title="Supprimer"
+                          (click)="deleteProduct(product)">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

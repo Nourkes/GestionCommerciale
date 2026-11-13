@@ -1,0 +1,88 @@
+<!-- En-tête de page -->
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Clients</h1>
+    <p class="page-subtitle">{{ clients().length }} client(s) enregistré(s)</p>
+  </div>
+  <a routerLink="/clients/new" class="btn btn-primary">
+    <i class="bi bi-plus-lg me-1"></i> Nouveau client
+  </a>
+</div>
+
+<div class="card">
+  <!-- Barre de recherche -->
+  <div class="card-body border-bottom">
+    <div class="input-group search-box">
+      <span class="input-group-text"><i class="bi bi-search"></i></span>
+      <input type="search" class="form-control"
+             placeholder="Rechercher par nom, email ou téléphone..."
+             [value]="searchTerm()" (input)="onSearch($event)" />
+    </div>
+  </div>
+
+  @if (isLoading()) {
+    <!-- Chargement -->
+    <div class="text-center py-5 text-muted">
+      <div class="spinner-border text-primary mb-2"></div>
+      <div>Chargement des clients...</div>
+    </div>
+  } @else if (filteredClients().length === 0) {
+    <!-- Aucun résultat -->
+    <div class="empty-state">
+      <i class="bi bi-people"></i>
+      @if (searchTerm()) {
+        <p>Aucun client ne correspond à « {{ searchTerm() }} ».</p>
+      } @else {
+        <p>Aucun client pour le moment.</p>
+        <a routerLink="/clients/new" class="btn btn-primary btn-sm">Ajouter le premier client</a>
+      }
+    </div>
+  } @else {
+    <!-- Tableau -->
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Client</th>
+            <th>Téléphone</th>
+            <th>Adresse</th>
+            <th>Créé le</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (client of filteredClients(); track client.id) {
+            <tr>
+              <td>
+                <div class="d-flex align-items-center gap-3">
+                  <span class="client-avatar">{{ client.lastName.charAt(0).toUpperCase() }}</span>
+                  <div>
+                    <div class="fw-semibold">{{ getFullName(client) }}</div>
+                    <div class="text-muted small">{{ client.email }}</div>
+                  </div>
+                </div>
+              </td>
+              <td>{{ client.phone || '—' }}</td>
+              <td class="text-truncate address-cell">{{ client.address || '—' }}</td>
+              <td>{{ client.createdAt | date: 'dd/MM/yyyy' }}</td>
+              <td class="text-end">
+                <div class="btn-group btn-group-sm">
+                  <a class="btn btn-light" [routerLink]="['/clients', client.id]" title="Voir le détail">
+                    <i class="bi bi-eye"></i>
+                  </a>
+                  <a class="btn btn-light" [routerLink]="['/clients', client.id, 'edit']" title="Modifier">
+                    <i class="bi bi-pencil"></i>
+                  </a>
+                  <button type="button" class="btn btn-light text-danger" title="Supprimer"
+                          (click)="deleteClient(client)">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

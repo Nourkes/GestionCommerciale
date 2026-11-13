@@ -1,0 +1,147 @@
+<div class="page-header">
+  <div>
+    <a routerLink="/orders" class="back-link"><i class="bi bi-arrow-left"></i> Retour aux commandes</a>
+    <h1 class="page-title">{{ isEditMode() ? 'Modifier la commande' : 'Nouvelle commande' }}</h1>
+  </div>
+</div>
+
+@if (isLoading()) {
+  <div class="text-center py-5 text-muted">
+    <div class="spinner-border text-primary mb-2"></div>
+    <div>Chargement...</div>
+  </div>
+} @else {
+  <form [formGroup]="orderForm" (ngSubmit)="onSubmit()" novalidate>
+
+    <!-- 1. Informations générales -->
+    <div class="card mb-4">
+      <div class="card-body p-4">
+        <h2 class="section-title">Informations</h2>
+        <div class="row g-3">
+          <div class="col-md-8">
+            <label for="clientId" class="form-label">Client <span class="text-danger">*</span></label>
+            <select id="clientId" class="form-select" formControlName="clientId" [class.is-invalid]="clientError()">
+              <option [ngValue]="null" disabled>Choisir un client...</option>
+              @for (client of clients(); track client.id) {
+                <option [ngValue]="client.id">{{ client.lastName }} {{ client.firstNameOrCompany }} — {{ client.email }}</option>
+              }
+            </select>
+            <div class="invalid-feedback">{{ clientError() }}</div>
+            @if (clients().length === 0) {
+              <small class="text-muted">Aucun client : <a routerLink="/clients/new">créez-en un d'abord</a>.</small>
+            }
+          </div>
+          <div class="col-md-4">
+            <label for="orderDate" class="form-label">Date de commande <span class="text-danger">*</span></label>
+            <input id="orderDate" type="date" class="form-control" formControlName="orderDate"
+                   [class.is-invalid]="dateError()" />
+            <div class="invalid-feedback">{{ dateError() }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Lignes de commande -->
+    <div class="card mb-4">
+      <div class="card-body p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h2 class="section-title mb-0">Produits commandés</h2>
+          <button type="button" class="btn btn-outline-primary btn-sm" (click)="addLine()">
+            <i class="bi bi-plus-lg me-1"></i> Ajouter un produit
+          </button>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table align-middle lines-table mb-0">
+            <thead>
+              <tr>
+                <th>Produit</th>
+                <th class="quantity-col">Quantité</th>
+                <th class="text-end">Prix unitaire HT</th>
+                <th class="text-end">Total ligne</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody formArrayName="lines">
+              @for (line of lines.controls; track line; let i = $index) {
+                <tr [formGroupName]="i">
+                  <td>
+                    <select class="form-select" formControlName="productId" [class.is-invalid]="lineError(i, 'productId')">
+                      <option [ngValue]="null" disabled>Choisir un produit...</option>
+                      @for (product of products(); track product.id) {
+                        <option [ngValue]="product.id"
+                                [disabled]="product.stockQuantity === 0 || isProductSelectedInOtherLine(product.id, i)">
+                          {{ product.reference }} — {{ product.name }}
+                          @if (product.stockQuantity === 0) { (rupture) }
+                        </option>
+                      }
+                    </select>
+                    <div class="invalid-feedback">{{ lineError(i, 'productId') }}</div>
+                    @if (lineSummaries()[i]?.product; as product) {
+                      <small class="text-muted">Stock disponible : {{ product.stockQuantity }}</small>
+                    }
+                  </td>
+                  <td>
+                    <input type="number" min="1" step="1" class="form-control" formControlName="quantity"
+                           [class.is-invalid]="lineError(i, 'quantity') || lineSummaries()[i]?.exceedsStock" />
+                    <div class="invalid-feedback">
+                      {{ lineError(i, 'quantity') ?? 'Stock insuffisant.' }}
+                    </div>
+                  </td>
+                  <td class="text-end">
+                    {{ (lineSummaries()[i]?.unitPrice ?? 0) | currency: currencyCode : 'code' : '1.3-3' }}
+                  </td>
+                  <td class="text-end fw-semibold">
+                    {{ (lineSummaries()[i]?.lineTotal ?? 0) | currency: currencyCode : 'code' : '1.3-3' }}
+                  </td>
+                  <td class="text-end">
+                    <button type="button" class="btn btn-light btn-sm text-danger" title="Retirer la ligne"
+                            [disabled]="lines.length === 1" (click)="removeLine(i)">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Totaux + actions -->
+    <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
+      <p class="text-muted small mb-0">
+        <i class="bi bi-info-circle me-1"></i>
+        Les totaux sont indicatifs : ils sont recalculés par le serveur à l'enregistrement.
+      </p>
+
+      <div class="card totals-card">
+        <div class="card-body">
+          <div class="total-row">
+            <span>Total HT</span>
+            <span>{{ totalHT() | currency: currencyCode : 'code' : '1.3-3' }}</span>
+          </div>
+          <div class="total-row">
+            <span>TVA ({{ vatRatePercent }} %)</span>
+            <span>{{ totalVAT() | currency: currencyCode : 'code' : '1.3-3' }}</span>
+          </div>
+          <div class="total-row total-row--grand">
+            <span>Total TTC</span>
+            <span>{{ totalTTC() | currency: currencyCode : 'code' : '1.3-3' }}</span>
+          </div>
+
+          <div class="d-flex gap-2 mt-3">
+            <a routerLink="/orders" class="btn btn-light flex-fill">Annuler</a>
+            <button type="submit" class="btn btn-primary flex-fill" [disabled]="isSaving()">
+              @if (isSaving()) {
+                <span class="spinner-border spinner-border-sm me-2"></span>
+              }
+              {{ isEditMode() ? 'Enregistrer' : 'Créer la commande' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </form>
+}

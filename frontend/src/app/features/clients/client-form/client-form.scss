@@ -1,0 +1,26 @@
+.form-card {
+  max-width: 820px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-bottom: 0.35rem;
+  color: var(--app-muted);
+  font-size: 0.9rem;
+  text-decoration: none;
+
+  &:hover {
+    color: var(--app-primary);
+  }
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1.75rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--app-border);
+}

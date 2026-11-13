@@ -1,0 +1,36 @@
+.section-title {
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.lines-table {
+  th { white-space: nowrap; }
+  td { vertical-align: top; }
+  select { min-width: 260px; }
+}
+
+.quantity-col {
+  width: 130px;
+}
+
+.totals-card {
+  width: 100%;
+  max-width: 380px;
+}
+
+.total-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.4rem 0;
+  color: var(--app-muted);
+
+  &--grand {
+    margin-top: 0.4rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--app-border);
+    color: var(--app-text);
+    font-size: 1.15rem;
+    font-weight: 700;
+  }
+}

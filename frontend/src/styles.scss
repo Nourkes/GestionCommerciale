@@ -1,0 +1,116 @@
+/* ═══════════════ Thème de l'application ═══════════════
+   Toutes les couleurs sont définies ici une seule fois.
+   Pour changer le style de toute l'application, on modifie ce bloc. */
+:root {
+  --app-primary: #4f46e5;        /* indigo */
+  --app-primary-hover: #4338ca;
+  --app-primary-soft: #eef2ff;   /* fond clair pour les éléments actifs */
+  --app-bg: #f5f7fb;             /* fond des pages */
+  --app-surface: #ffffff;        /* fond des cartes */
+  --app-text: #1f2937;
+  --app-muted: #6b7280;
+  --app-border: #e5e7eb;
+  --app-radius: 12px;
+
+  /* On branche ce thème sur les variables de Bootstrap */
+  --bs-primary: var(--app-primary);
+  --bs-primary-rgb: 79, 70, 229;
+  --bs-link-color: var(--app-primary);
+  --bs-link-color-rgb: 79, 70, 229;
+  --bs-body-font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --bs-body-color: var(--app-text);
+  --bs-body-bg: var(--app-bg);
+  --bs-border-color: var(--app-border);
+  --bs-border-radius: 8px;
+}
+
+body {
+  background: var(--app-bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ───── Boutons ───── */
+.btn {
+  font-weight: 500;
+  border-radius: 8px;
+}
+
+.btn-primary {
+  --bs-btn-bg: var(--app-primary);
+  --bs-btn-border-color: var(--app-primary);
+  --bs-btn-hover-bg: var(--app-primary-hover);
+  --bs-btn-hover-border-color: var(--app-primary-hover);
+  --bs-btn-active-bg: var(--app-primary-hover);
+  --bs-btn-active-border-color: var(--app-primary-hover);
+  --bs-btn-disabled-bg: var(--app-primary);
+  --bs-btn-disabled-border-color: var(--app-primary);
+}
+
+.btn-outline-primary {
+  --bs-btn-color: var(--app-primary);
+  --bs-btn-border-color: var(--app-primary);
+  --bs-btn-hover-bg: var(--app-primary);
+  --bs-btn-hover-border-color: var(--app-primary);
+  --bs-btn-active-bg: var(--app-primary-hover);
+}
+
+/* ───── Cartes ───── */
+.card {
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius);
+  box-shadow: 0 1px 3px rgba(16, 24, 40, 0.06);
+}
+
+/* ───── Formulaires ───── */
+.form-label {
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.form-control,
+.form-select {
+  padding: 0.6rem 0.85rem;
+  border-color: var(--app-border);
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--app-primary);
+  box-shadow: 0 0 0 0.2rem rgba(79, 70, 229, 0.15);
+}
+
+.input-group-text {
+  background: var(--app-surface);
+  color: var(--app-muted);
+  border-color: var(--app-border);
+}
+
+/* ───── Tableaux ───── */
+.table thead th {
+  background: #f9fafb;
+  color: var(--app-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* ───── En-tête de page (réutilisé sur toutes les pages) ───── */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.page-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.page-subtitle {
+  color: var(--app-muted);
+  margin: 0.25rem 0 0;
+}
